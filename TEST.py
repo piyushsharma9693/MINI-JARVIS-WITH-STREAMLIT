@@ -1,10 +1,9 @@
 import streamlit as st
-import speech_recognition as sr
 from gtts import gTTS
 import datetime
 import os
 
-# Text-to-speech function using gTTS and Streamlit audio
+# Text-to-speech function
 def speak(text):
     tts = gTTS(text=text, lang='en')
     tts.save("output.mp3")
@@ -25,37 +24,26 @@ def wishMe():
     speak(greeting)
     return f"{greeting} I am your assistant. How can I help you?"
 
-# Speech recognition function
-def takeCommand():
-    recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
-        st.info("Listening...")
-        audio = recognizer.listen(source)
-
-    try:
-        st.info("Recognizing...")
-        query = recognizer.recognize_google(audio, language='en-in')
-        return query
-    except Exception:
-        return "Sorry, I didn't catch that. Please try again."
-
 # Streamlit App
-st.title("🧠 Mini Jarvis - Voice Assistant")
-st.write("Click the button and speak your command.")
+st.title("🧠 Mini Jarvis - Deployment Version")
+st.write("Type your command below:")
 
-if st.button("🎙 Start Listening"):
+if st.button("🤖 Greet Me"):
     wish_text = wishMe()
     st.success(wish_text)
-    query1 = takeCommand()
-    st.write(f"🗣 You said: {query1}")
 
-    if 'time' in query1:
+query1 = st.text_input("💬 Enter your command:")
+
+if query1:
+    st.write(f"🗣 You typed: {query1}")
+
+    if 'time' in query1.lower():
         current_time = datetime.datetime.now().strftime("%H:%M:%S")
         response = f"The current time is {current_time}"
         speak(response)
         st.success(response)
 
-    elif 'exit' in query1 or 'stop' in query1:
+    elif 'exit' in query1.lower() or 'stop' in query1.lower():
         speak("Goodbye!")
         st.warning("Assistant stopped.")
 
