@@ -1,16 +1,16 @@
-import streamlit as st
+import speech_recognition as sr
 from gtts import gTTS
 import datetime
+import playsound
 import os
 
-# Text-to-speech function
+# Function to convert text to speech
 def speak(text):
     tts = gTTS(text=text, lang='en')
-    tts.save("output.mp3")
-    audio_file = open("output.mp3", "rb")
-    st.audio(audio_file.read(), format="audio/mp3")
-    audio_file.close()
-    os.remove("output.mp3")
+    filename = "output.mp3"
+    tts.save(filename)
+    playsound.playsound(filename)
+    os.remove(filename)
 
 # Greeting function
 def wishMe():
@@ -24,30 +24,27 @@ def wishMe():
     speak(greeting)
     return f"{greeting} I am your assistant. How can I help you?"
 
-# Streamlit App
-st.title("🧠 Mini Jarvis - Deployment Version")
-st.write("Type your command below:")
+# Function to take microphone input and return as text
+def takeCommand():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        recognizer.pause_threshold = 1
+        audio = recognizer.listen(source)
 
-if st.button("🤖 Greet Me"):
+    try:
+        print("Recognizing...")
+        query = recognizer.recognize_google(audio, language='en-in')
+        print(f"You said: {query}")
+        return query
+    except Exception as e:
+        print("Sorry, I didn't catch that. Please try again.")
+        return "None"
+
+# Main program
+if __name__ == "__main__":
     wish_text = wishMe()
-    st.success(wish_text)
+    print(wish_text)
 
-query1 = st.text_input("💬 Enter your command:")
-
-if query1:
-    st.write(f"🗣 You typed: {query1}")
-
-    if 'time' in query1.lower():
-        current_time = datetime.datetime.now().strftime("%H:%M:%S")
-        response = f"The current time is {current_time}"
-        speak(response)
-        st.success(response)
-
-    elif 'exit' in query1.lower() or 'stop' in query1.lower():
-        speak("Goodbye!")
-        st.warning("Assistant stopped.")
-
-    else:
-        response = "I didn't understand that. Please try again."
-        speak(response)
-        st.error(response)
+    while True:
+        query1 =
